@@ -263,6 +263,8 @@ public class ERXResourceManager extends WOResourceManager {
 			StringBuffer sb = new StringBuffer();
 			String serverPortStr = context.request()._serverPort();
 			int serverPort = (serverPortStr == null) ? 0 : Integer.parseInt(serverPortStr);
+			if(serverPort == 443 && requestIsSecure && !resourceIsSecure)
+				serverPort = 80;
 			context.request()._completeURLPrefix(sb, resourceIsSecure, serverPort);
 			sb.append(url);
 			completeUrl = sb.toString();
