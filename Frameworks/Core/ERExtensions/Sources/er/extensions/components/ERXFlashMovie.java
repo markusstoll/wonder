@@ -76,4 +76,16 @@ public class ERXFlashMovie extends ERXStatelessComponent {
 		}
 		return movieUrl;
 	}
+	
+	public String getCodebase() {		
+		return protocol() + "download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0";
+	}
+	
+	public String getPluginspage() {
+		return protocol() + "www.macromedia.com/go/getflashplayer";
+	}
+
+	private String protocol() {
+		return context().request().isSecure() ? "https://" : "http://";
+	}
 }
