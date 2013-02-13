@@ -172,7 +172,9 @@ public abstract class ERXApplication extends ERXAjaxApplication implements ERXGr
 	public static final Logger startupLog = Logger.getLogger("er.extensions.ERXApplication.Startup");
 
 	private static boolean wasERXApplicationMainInvoked = false;
+    private static String[] myAppExtensions = {};
 
+    
 	/**
 	 * Notification to get posted when we get an OutOfMemoryError or when memory passes
 	 * the low memory threshold set in er.extensions.ERXApplication.memoryLowThreshold. 
@@ -2842,5 +2844,19 @@ public abstract class ERXApplication extends ERXAjaxApplication implements ERXGr
 	public void terminate() {
 		NSNotificationCenter.defaultCenter().postNotification(ApplicationWillTerminateNotification, this);
 		super.terminate();
+	}
+
+ /**
+  * Override default implementation that returns {".dll", ".exe"} and therefor prohibits IIS
+  * as WebServer.
+  */
+	public String[] adaptorExtensions() {
+		return myAppExtensions;
+	}
+
+	@Override
+	public boolean _isForeignSupportedDevelopmentPlatform() {
+		String osName = System.getProperty("os.name");
+		return osName != null && osName.startsWith("Windows");
 	}
 }
