@@ -1,5 +1,9 @@
 package er.extensions.components;
 
+import java.lang.reflect.InvocationTargetException;
+
+import org.apache.log4j.Logger;
+
 import com.webobjects.appserver.WOActionResults;
 import com.webobjects.appserver.WOApplication;
 import com.webobjects.appserver.WOAssociation;
@@ -10,6 +14,7 @@ import com.webobjects.appserver.WORequest;
 import com.webobjects.appserver.WOResponse;
 import com.webobjects.appserver._private.WOHTMLDynamicElement;
 import com.webobjects.foundation.NSDictionary;
+import com.webobjects.foundation.NSSelector;
 
 import er.extensions.appserver.ERXResponse;
 
@@ -22,18 +27,21 @@ import er.extensions.appserver.ERXResponse;
  * @binding src absolute url to render from
  * @binding pageName name of the page to open
  * @binding action renders the action result as the content
+ * @binding actionNameForPageName action name when using with pageName
  */
 public class ERXIFrame extends WOHTMLDynamicElement {
 
 	WOAssociation _src;
 	WOAssociation _pageName;
 	WOAssociation _action;
+	WOAssociation _actionNameForPageName;
 
 	public ERXIFrame(String name, NSDictionary<String, WOAssociation> associations, WOElement parent) {
 		super("iframe", associations, parent);
-		_src = associations.objectForKey("src");
-		_pageName = associations.objectForKey("pageName");
-		_action = associations.objectForKey("action");
+		_src = (WOAssociation) _associations.removeObjectForKey("src");
+		_pageName = (WOAssociation) _associations.removeObjectForKey("pageName");
+		_action = (WOAssociation) _associations.removeObjectForKey("action");
+		_actionNameForPageName = (WOAssociation) _associations.removeObjectForKey("actionNameForPageName");
 	}
 
 	@Override
@@ -48,7 +56,20 @@ public class ERXIFrame extends WOHTMLDynamicElement {
 			if(context.senderID().equals(context.elementID())) {
 				if (_pageName != null) {
 					String pageName = (String) _pageName.valueInComponent(component);
-					return WOApplication.application().pageWithName(pageName, context);
+					WOActionResults result = WOApplication.application().pageWithName(pageName, context);
+					if(_actionNameForPageName != null)
+					{
+						WOComponent actionResult = null;
+						try {
+							actionResult = new NSSelector<WOComponent>((String)_actionNameForPageName.valueInComponent(component)).invoke(result, null);
+						}
+						catch (Exception e) {
+							e.printStackTrace();
+						}
+						if(actionResult != null)
+							result = actionResult;
+					}
+					return result;
 				}
 				else if (_action != null) {
 					return (WOActionResults) _action.valueInComponent(component);
@@ -83,12 +104,12 @@ public class ERXIFrame extends WOHTMLDynamicElement {
     public void appendAttributesToResponse(WOResponse response, WOContext context) {
     	WOComponent component = context.component();
 		String src = null;
-		if (_src != null) {
+		if (_src != null)
 			src = (String) _src.valueInComponent(component);
-		}
-		else {
+
+		if (src == null)
 			src = context.componentActionURL();
-		}
+
 		response.appendContentString(" src=\"");
     	response.appendContentHTMLAttributeValue(src);
     	response.appendContentString("\"");
