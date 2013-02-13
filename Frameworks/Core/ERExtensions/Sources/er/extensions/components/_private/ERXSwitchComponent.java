@@ -23,9 +23,9 @@ import com.webobjects.foundation.NSMutableDictionary;
 public class ERXSwitchComponent extends WODynamicElement {
 	WOAssociation componentName;
 	public NSMutableDictionary componentAttributes;
-	NSMutableDictionary componentCache;
+	protected NSMutableDictionary componentCache;
 	private NSMutableDictionary<String, String> elementIDByName;
-	WOElement template;
+	protected WOElement template;
 
 	public ERXSwitchComponent(String paramString, NSDictionary paramNSDictionary, WOElement paramWOElement) {
 		super(null, null, null);
