@@ -185,10 +185,20 @@ public class ERXMigrator {
 
 		Map<IERXPostMigration, ERXModelVersion> postMigrations = new LinkedHashMap<IERXPostMigration, ERXModelVersion>();
 		Iterator<IERXMigration> migrationsIter = migrations.keySet().iterator();
+		int currentVersion = -1;
+		String currentModelName = null;
+		
 		while (migrationsIter.hasNext()) {
 			IERXMigration migration = migrationsIter.next();
 			ERXModelVersion modelVersion = migrations.get(migration);
+			
+			if(modelVersion.version() <= currentVersion &&
+					modelVersion.model().name().equals(currentModelName))
+				continue;
+			
 			EOModel model = modelVersion.model();
+			currentModelName = model.name();
+			
 			IERXMigrationLock migrationLock = databaseLockForModel(model);
 			EOEditingContext editingContext = newEditingContext();
 			editingContext.lock();
@@ -198,7 +208,7 @@ public class ERXMigrator {
 					ERXSQLHelper helper = ERXSQLHelper.newSQLHelper(model);
 					try {
 						helper.prepareConnectionForSchemaChange(editingContext, model);
-						migrationAction.perform(editingContext, model.name());
+						currentVersion = migrationAction.perform(editingContext, model.name());
 					}
 					finally {
 						helper.restoreConnectionSettingsAfterSchemaChange(editingContext, model);
@@ -447,6 +457,8 @@ public class ERXMigrator {
 		protected int doPerform(EOAdaptorChannel channel) {
 			EOModel model = _modelVersion.model();
 			boolean locked;
+			int lockTryCount = 15;
+			
 			do {
 				locked = _migrationLock.tryLock(channel, model, _lockOwnerName);
 				if (!locked) {
@@ -457,14 +469,18 @@ public class ERXMigrator {
 						// do nothing
 					}
 				}
-				// MS: Do we put a timeout here? It could take a very long time
-				// ...
+
+				lockTryCount--;
+				if(lockTryCount <= 0)
+					throw new ERXMigrationFailedException("Migration failed - no lock obtainable for updating model " + model.name());
 			}
 			while (!locked);
 
+			int currentVersion = 0;
+			
 			if (locked) {
 				try {
-					int currentVersion = _migrationLock.versionNumber(channel, model);
+					currentVersion = _migrationLock.versionNumber(channel, model);
 					int nextVersion = _modelVersion.version();
 					if (currentVersion < nextVersion) {
 						if (ERXMigrator.log.isInfoEnabled()) {
@@ -472,6 +488,7 @@ public class ERXMigrator {
 						}
 						_migration.upgrade(_editingContext, channel, model);
 						_migrationLock.setVersionNumber(channel, model, nextVersion);
+						currentVersion = nextVersion;
 						_editingContext.saveChanges();
 						channel.adaptorContext().commitTransaction();
 						channel.adaptorContext().beginTransaction();
@@ -492,9 +509,11 @@ public class ERXMigrator {
 				finally {
 					_migrationLock.unlock(channel, model);
 				}
+				
+				return currentVersion;
 			}
 
-			return 0;
+			return -1;
 		}
 	}
 }
