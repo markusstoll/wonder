@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import com.webobjects.appserver.WOApplication;
 import com.webobjects.appserver.WOContext;
 import com.webobjects.appserver.WORequest;
+import com.webobjects.appserver._private.WOCGIFormValues;
 import com.webobjects.appserver._private.WOProperties;
 import com.webobjects.appserver._private.WOShared;
 import com.webobjects.appserver._private.WOURLFormatException;
@@ -571,6 +572,38 @@ public  class ERXRequest extends WORequest {
 		}
 		return mutableUserInfo;
 	}
+	
+    @Override
+    protected NSDictionary<String, NSArray<Object>> getFormValuesFromURLEncoding() {
+        NSMutableDictionary formValues = new NSMutableDictionary();
+        String urlEncoding = defaultFormValueEncoding();
+        String dataEncoding = defaultFormValueEncoding();
+        String queryString = queryString();
+        if(queryString != null && queryString.length() > 0)
+        {
+            if(!isRequestFromFormSubmission())
+                urlEncoding = WOCGIFormValues.getInstance().getWOURLEncoding(queryString);
+            formValues.addEntriesFromDictionary(WOCGIFormValues.getInstance().decodeCGIFormValues(queryString, urlEncoding));
+        }
+
+        String contentType = contentType();
+    	if(contentType != null && contentType.toLowerCase().startsWith("application/x-www-form-urlencoded"))
+    	{
+    		String contentString = removeCRLF(contentString());
+            if(contentString != null && contentString.length() > 0)
+            {
+            	dataEncoding = detectFormValuesEncoding(contentString);
+            		formValues.addEntriesFromDictionary(WOCGIFormValues.getInstance().decodeDataFormValues(contentString, dataEncoding));
+            }
+    	}
+        if(method().equalsIgnoreCase("GET") || method().equalsIgnoreCase("HEAD"))
+            setFormValueEncoding(urlEncoding);
+        else
+        if(method().equalsIgnoreCase("POST"))
+            setFormValueEncoding(dataEncoding);
+        return formValues;
+    }
+
 	public boolean isLocal() {
         String remoteHostAddress = remoteHostAddress();
         String acceptingHostAddress = _acceptingAddress().getHostAddress();
