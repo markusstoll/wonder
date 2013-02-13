@@ -296,6 +296,9 @@ public abstract class ERXAjaxApplication extends WOApplication {
 	@SuppressWarnings("javadoc")
 	public static boolean isAjaxRequest(WORequest request) {
 		String requestedWith = request.headerForKey("x-requested-with");
+		if(requestedWith == null)
+			requestedWith = request.headerForKey("http_x_requested_with");
+
 		return "XMLHttpRequest".equals(requestedWith);
 	}
 
