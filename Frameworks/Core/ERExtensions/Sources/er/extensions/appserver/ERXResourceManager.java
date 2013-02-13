@@ -226,6 +226,19 @@ public class ERXResourceManager extends WOResourceManager {
 		String completeURL = null;
 		if (request == null || request.isUsingWebServer() && !WOApplication.application()._rapidTurnaroundActiveForAnyProject()) {
 			completeURL = _cachedURLForResource(name, bundleName, languages, request);
+
+			WOContext context = null;
+			if (request != null) {
+				context = (WOContext) request.valueForKey("context");
+
+				if(context != null && context.doesGenerateCompleteURLs())
+				{
+					StringBuffer sb = new StringBuffer();
+					request._completeURLPrefix(sb, request.isSecure(), 0);
+					sb.append(completeURL);
+					completeURL = sb.toString();
+				}
+			}
 		}
 		else {
 			URL url = pathURLForResourceNamed(name, bundleName, languages);
