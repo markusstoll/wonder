@@ -225,9 +225,10 @@ public class ERXSession extends ERXAjaxSession implements Serializable {
       _localizer = newLocalizer;
       ERXLocalizer.setCurrentLocalizer(_localizer);
 
-      if (browser() != null) {
-        _messageEncoding = browser().messageEncodingForLanguage(_localizer.language());
-      }
+      // rely on lazy init
+//      if (browser() != null) {
+//        _messageEncoding = browser().messageEncodingForLanguage(_localizer.language());
+//      }
 
       NSMutableArray languageList = new NSMutableArray(_localizer.language());
       if (!languageList.containsObject("Nonlocalized"))
@@ -259,9 +260,11 @@ public class ERXSession extends ERXAjaxSession implements Serializable {
 
       _localizer = newLocalizer;
       ERXLocalizer.setCurrentLocalizer(_localizer);
-      if (browser() != null) {
-        _messageEncoding = browser().messageEncodingForLanguage(_localizer.language());
-      }
+
+      // rely on lazy init
+//      if (browser() != null) {
+//        _messageEncoding = browser().messageEncodingForLanguage(_localizer.language());
+//      }
     }
   }
 
