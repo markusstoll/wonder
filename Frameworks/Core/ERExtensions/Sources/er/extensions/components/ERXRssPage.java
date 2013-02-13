@@ -35,7 +35,7 @@ public class ERXRssPage extends ERXStatelessComponent {
 	}
 
 	public Object dateFormatter() {
-		return new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
+		return new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
 	}
 	
 	public Object itemGuid() {
