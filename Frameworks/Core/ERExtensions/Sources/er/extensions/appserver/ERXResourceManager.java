@@ -215,9 +215,25 @@ public class ERXResourceManager extends WOResourceManager {
 		else {
 			resourceUrlPrefix = ERXProperties.stringForKey("er.extensions.ERXResourceManager.resourceUrlPrefix");
 		}
+		
 		if (resourceUrlPrefix != null && resourceUrlPrefix.length() > 0) {
 			result = resourceUrlPrefix + result;
+		} else {
+		    // take care of WebServer Resource paths in servlet deployment
+			String servletWebResourcePrefix = ERXProperties.stringForKey("er.extensions.ERXResourceManager.servletWebResourcePrefix");
+			if (servletWebResourcePrefix != null) 
+			{
+				if(request != null) {
+					String servletName = request.adaptorPrefix().split("/")[1];
+					servletWebResourcePrefix = "/" + servletName + servletWebResourcePrefix;
+					ERXProperties.setStringForKey(servletWebResourcePrefix, "er.extensions.ERXResourceManager.secureResourceUrlPrefix");
+					ERXProperties.setStringForKey(servletWebResourcePrefix, "er.extensions.ERXResourceManager.resourceUrlPrefix");
+
+					result = servletWebResourcePrefix + result;
+				}
+			}			
 		}
+		
 		return result;
 	}
 
