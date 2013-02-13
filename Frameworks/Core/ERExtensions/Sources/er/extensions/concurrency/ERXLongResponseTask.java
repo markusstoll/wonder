@@ -5,6 +5,7 @@ package er.extensions.concurrency;
 
 import org.apache.log4j.Logger;
 
+import com.webobjects.appserver.WOActionResults;
 import com.webobjects.appserver.WOApplication;
 import com.webobjects.appserver.WOComponent;
 import com.webobjects.foundation.NSArray;
@@ -37,7 +38,7 @@ public interface ERXLongResponseTask extends Runnable {
 	public void stop();
 	
 	/** @return next page according to inner status. */
-	public WOComponent nextPage();
+	public WOActionResults nextPage();
 	
 	/**
 	 * Special worker thread that holds the reference to the task so we can 
@@ -160,7 +161,8 @@ public interface ERXLongResponseTask extends Runnable {
 		    _done = false;
 		    
 		    log.debug("creating computation thread");
-		    
+	        setException(null);
+
 		    // called to start new thread
 		    try {
 		        setResult(performAction());
@@ -305,7 +307,7 @@ public interface ERXLongResponseTask extends Runnable {
 		 * @param aResult some result object
 		 * @return result page for successful completion
 		 */
-		protected WOComponent pageForResult(Object aResult)  {
+		protected WOActionResults pageForResult(Object aResult)  {
 			return longResponse().context().page();
 		}
 
@@ -323,7 +325,8 @@ public interface ERXLongResponseTask extends Runnable {
 		/**
 		 * Default implementation that controls the pages returned on each iteration.
 		 */
-		public WOComponent nextPage() {
+		
+		public WOActionResults nextPage() {
 			Exception e = exception();
 			if (e != null) {
 				return pageForException(e);
