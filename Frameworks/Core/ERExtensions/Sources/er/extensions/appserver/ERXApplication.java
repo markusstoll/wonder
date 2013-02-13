@@ -2122,7 +2122,7 @@ public abstract class ERXApplication extends ERXAjaxApplication implements ERXGr
 
 		if (responseCompressionEnabled()) {
 			String contentType = response.headerForKey("content-type");
-			if (!"gzip".equals(response.headerForKey("content-encoding")) && (contentType != null) && (contentType.startsWith("text/") || responseCompressionTypes().containsObject(contentType))) {
+			if (response.headerForKey("content-encoding") == null && contentType != null && (contentType.startsWith("text/") || responseCompressionTypes().containsObject(contentType))) {
 				String acceptEncoding = request.headerForKey("accept-encoding");
 				if ((acceptEncoding != null) && (acceptEncoding.toLowerCase().indexOf("gzip") != -1)) {
 					long start = System.currentTimeMillis();
