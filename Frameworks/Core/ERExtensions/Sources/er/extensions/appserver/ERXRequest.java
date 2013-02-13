@@ -494,8 +494,8 @@ public  class ERXRequest extends WORequest {
     }
     
     /**
-     * @return remote client host address
-     * @deprecated use {@link #remoteHostAddress()}
+     * @return return remote host address
+     * @deprecated Use remoteHostAddress() instead
      */
     @Deprecated
 	public String remoteHost() {
@@ -510,17 +510,33 @@ public  class ERXRequest extends WORequest {
      * @return remote client host address
      */
     public String remoteHostAddress() {
+    	// host headers are set by WOAdaptor
+    	// if more than one of allowed headers is set, ALL have to supply the same value!
+    	// to avoid spoofing by simulating local access
+    	String remoteAddressHeaderValue = null;
+        for (String key : HOST_ADDRESS_KEYS) {
+        	String t = headerForKey(key); 
+			if (t != null) {
+				if(remoteAddressHeaderValue == null)
+					remoteAddressHeaderValue = t;
+				else if(!t.equals(remoteAddressHeaderValue))
+				{
+					remoteAddressHeaderValue = null;
+					break;
+				}
+			}
+		}
+
+        if (remoteAddressHeaderValue != null) {
+			return remoteAddressHeaderValue;
+		}
+
         if (WOApplication.application().isDirectConnectEnabled()) {
             if (_originatingAddress() != null) {
                 return _originatingAddress().getHostAddress();
             }
         }
-        for (String key : HOST_ADDRESS_KEYS) {
-        	String remoteAddressHeaderValue = headerForKey(key); 
-			if (remoteAddressHeaderValue != null) {
-				return remoteAddressHeaderValue;
-			}
-		}
+        
         return UNKNOWN_HOST;
     }
     
@@ -555,4 +571,13 @@ public  class ERXRequest extends WORequest {
 		}
 		return mutableUserInfo;
 	}
+	public boolean isLocal() {
+        String remoteHostAddress = remoteHostAddress();
+        String acceptingHostAddress = _acceptingAddress().getHostAddress();
+        
+        return (remoteHostAddress.equals(acceptingHostAddress) 
+        		|| remoteHostAddress.equals("127.0.0.1")
+        		|| remoteHostAddress.equals("::1"));
+	}
+    
 }
