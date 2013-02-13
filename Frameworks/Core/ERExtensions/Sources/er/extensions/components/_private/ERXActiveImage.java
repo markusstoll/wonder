@@ -31,5 +31,11 @@ public class ERXActiveImage extends ActiveImage {
                 woresponse._appendTagAttributeAndValue("title", value, false);
             }
         }
+        if(_class != null) {
+            String value = (String) _class.valueInComponent(wocontext.component());
+            if(value != null) {
+                woresponse._appendTagAttributeAndValue("class", value, false);
+            }
+        }
     }
 }
