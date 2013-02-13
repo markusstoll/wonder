@@ -72,7 +72,7 @@ public class ERXLongResponse extends ERXNonSynchronizingComponent {
     	_refreshInterval = Integer.valueOf(value);
     }
     
-    public WOComponent refresh() {
+    public WOActionResults refresh() {
     	return task().nextPage();
     }
     
