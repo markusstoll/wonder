@@ -3,7 +3,8 @@
     border-color:#fff;
 }
 #ibox_wrapper, #ibox_footer_wrapper a { background-color:#fff; }
-#ibox_content { background-color:#fff; border:0; margin: 10px 10px 40px 10px; }
+#ibox_spacer {padding:10px 10px 40px 10px;width:0px;height:0px;visibility:hidden} 
+#ibox_content { background-color:#fff; border:0; top:10px; left:10px;}
 #ibox_footer_wrapper {
     line-height: 25px;
     bottom: 5px;
