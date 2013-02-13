@@ -419,8 +419,8 @@ public  class ERXRequest extends WORequest {
         try {
             return super.cookieValues();
         } catch (Throwable t) {
-            log.warn(t + ":" + this);
-            log.warn(t);
+//            log.warn(t + ":" + this);
+//            log.warn(t);
             return NSDictionary.EmptyDictionary;
         }
     }    
