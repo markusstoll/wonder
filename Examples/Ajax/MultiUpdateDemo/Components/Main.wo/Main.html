@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+  <head>
+    <title>Untitled</title>
+  </head>
+  <body>
+    <wo:form action="$reload">
+      <table>
+        <tr>
+          <td>Factor</td>
+          <td>UpdateTrigger</td>
+          <td>Multi-Updates</td>
+        </tr>
+        <wo:repetition count="$maxCount" index="$index">
+          <tr>
+            <td> input * <wo:str value="~(index+1)" /></td>
+            <td>
+              <wo:AjaxUpdateContainer id="~\"Sinput\" + index">
+                <wo:AjaxObserveField updateContainerID="~\"Shelper\" + index" actOnKeyUp="$true">
+                  <wo:textField value="$number" numberformat="0"> </wo:textField>
+                </wo:AjaxObserveField>
+              </wo:AjaxUpdateContainer>
+              <wo:AjaxUpdateContainer id="~\"Shelper\" + index"> <wo:AjaxUpdateTrigger updateContainerIDs="$SucArray" /> </wo:AjaxUpdateContainer>
+            </td>
+            <td>
+              <wo:AjaxUpdateContainer id="~\"Minput\" + index">
+                <wo:AjaxObserveField updateContainerID="$MucArray" actOnKeyUp="$true">
+                  <wo:textField value="$number" numberformat="0"> </wo:textField>
+                </wo:AjaxObserveField>
+              </wo:AjaxUpdateContainer>
+            </td>
+          </tr>
+        </wo:repetition>
+      </table>
+    </wo:form>
+    <div>
+      <wo:hyperlink action="$reload">reload</wo:hyperlink>
+    </div>
+  </body>
+</html>
