@@ -36,6 +36,8 @@ public class ERXLogger extends org.apache.log4j.Logger {
 	/** logging supprt */
 	public static Logger log;
 	public static Factory factory = null;
+	private static boolean cvResetLoggerConfiguration = true;
+
 	static {
 		String factoryClassName = System.getProperty("log4j.loggerFactory");
 		if (factoryClassName == null) {
@@ -55,6 +57,13 @@ public class ERXLogger extends org.apache.log4j.Logger {
 		} else {
 			ERXLogger.factory = new Factory();
 		}
+		
+		String resetLoggerConfigurationSetting =
+			System.getProperty(ERXLogger.class.getName() + ".resetLoggerConfiguration");
+		cvResetLoggerConfiguration =
+			((resetLoggerConfigurationSetting != null && resetLoggerConfigurationSetting.length() > 0)
+                ? Boolean.valueOf(resetLoggerConfigurationSetting)
+                : true);
 	}
 
 	/**
@@ -180,7 +189,7 @@ public class ERXLogger extends org.apache.log4j.Logger {
 	 *            with the logging configuration
 	 */
 	public static synchronized void configureLogging(Properties properties) {
-		LogManager.resetConfiguration();
+		if(cvResetLoggerConfiguration) LogManager.resetConfiguration();
 		BasicConfigurator.configure();
 		// AK: we re-configure the logging a few lines later from the
 		// properties, but in case
