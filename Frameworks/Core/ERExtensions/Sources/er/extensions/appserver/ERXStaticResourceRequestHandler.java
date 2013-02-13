@@ -67,7 +67,16 @@ public class ERXStaticResourceRequestHandler extends WORequestHandler {
 	}
 
 	protected WOResponse _generateResponseForInputStream(InputStream is, long length, String type) {
+		return _generateResponseForInputStream(null, is, length, type);
+	}
+	
+	protected WOResponse _generateResponseForInputStream(WORequest aRequest, InputStream is, long length, String type) {
 		WOResponse response = application.createResponseInContext(null);
+
+        if(aRequest != null) {
+        	response.setHTTPVersion(aRequest.httpVersion());
+        }
+        
 		if (is != null) {
 			if (length != 0) {
 				response.setContentStream(is, 50*1024, length);
@@ -168,7 +177,7 @@ public class ERXStaticResourceRequestHandler extends WORequestHandler {
 		} else {
 			log.error("Can't fetch relative path: " + uri);
 		}
-		response = _generateResponseForInputStream(is, length, contentType);
+		response = _generateResponseForInputStream(request, is, length, contentType);
 		NSNotificationCenter.defaultCenter().postNotification(WORequestHandler.DidHandleRequestNotification, response);
 		response._finalizeInContext(null);
 		return response;
