@@ -42,6 +42,8 @@ var iBox = function() {
 		is_opera: navigator.userAgent.indexOf('Opera/9') != -1,
 		is_ie: navigator.userAgent.indexOf("MSIE ") != -1,
 		is_ie6: false /*@cc_on || @_jscript_version < 5.7 @*/,
+		// MP: WebKit check
+		is_webkit: navigator.userAgent.indexOf("AppleWebKit") != -1,
 		is_firefox: navigator.appName == "Netscape" && navigator.userAgent.indexOf("Gecko") != -1 && navigator.userAgent.indexOf("Netscape") == -1,
 		is_mac: navigator.userAgent.indexOf('Macintosh') != -1,
 
@@ -129,21 +131,91 @@ var iBox = function() {
 			
 			// reset offsets
 			offset.container = [els.wrapper.offsetLeft*2, els.wrapper.offsetTop*2];
-			offset.wrapper = [els.wrapper.offsetWidth-els.content.offsetWidth, els.wrapper.offsetHeight-els.content.offsetHeight];
+
+			// MP: do not include dimension of an existing scrollbar in the calculation
+			var overflowSetting = { x: null, y: null, global: null };
+			try
+			{
+				overflowSetting.global = els.content.style.overflow;
+				if(overflowSetting.global && overflowSetting.global.length == 0) overflowSetting.global = null;
+				overflowSetting.x  = els.content.style.overflowX;
+				if(overflowSetting.x && overflowSetting.x.length == 0) overflowSetting.x = null;
+				overflowSetting.y  = els.content.style.overflowY;
+				if(overflowSetting.y && overflowSetting.y.length == 0) overflowSetting.y = null;
+			}
+			catch(e)
+			{
+				overflowSetting.x = null;
+				overflowSetting.y = null;
+			}
+            // MP: calculate minimum required width/height (= border and padding size)
+			els.content.style.overflow = 'hidden';
+			var contentWidth = els.content.offsetWidth;
+			var contentHeight = els.content.offsetHeight;
+			els.content.style.width = '0px';
+			els.content.style.height = '0px';
+			var minWidth = els.content.offsetWidth;
+			var minHeight = els.content.offsetHeight;
+			els.content.style.width = (contentWidth - minWidth) + 'px';
+			els.content.style.height = (contentHeight - minHeight) + 'px';
+			// MP: restore overflow setting
+			if(overflowSetting.global) els.content.style.overflow = overflowSetting.global;
+			if(overflowSetting.x) els.content.style.overflowX = overflowSetting.x;
+			if(overflowSetting.y) els.content.style.overflowY = overflowSetting.y;
+
+			// MP: calculate width/height in a different way
+			offset.wrapper = 
+			    [els.wrapper.clientWidth, 
+			     els.wrapper.clientHeight,
+			     minWidth, 
+			     minHeight]; 
 
 			// TODO: remove the +4 when issue is solved with calculations
-			offset.wrapper[1] += 4;
+            // MP: should not longer be necessary (offset.wrapper[1] += 4)
 
-			if (params.width) var width = params.width;
-			else var width = _pub.default_width;
-
-			if (params.height) var height = params.height;
-			else {
-				els.content.style.height = '100%';
-				// MS: changed to 21 -- a scrollbar appeared otherwise
-				var height = els.content.offsetHeight + 21;
-				els.content.style.height = '';
+			var width;
+			if(params.width)
+			{
+				width = params.width;
 			}
+			else
+			{
+                // MP: another determination of the default width
+				if(els.content.firstChild)
+				{
+					try
+					{
+						width = els.content.firstChild.offsetWidth;
+					} catch(e) {}
+				}
+				if(!width)
+				{
+					width = _pub.default_width;
+				}
+			}
+
+			var height;
+			if(params.height)
+			{
+				height = params.height;
+			}
+			else 
+			{
+                // MP: another determination of the default width
+				if(els.content.firstChild)
+				{
+					try
+					{
+						height = els.content.firstChild.offsetHeight;
+					} catch(e) {}
+				}
+				if(!height)
+				{
+					els.content.style.height = '100%';
+					height = els.content.offsetHeight;
+				}
+			}
+
 			active.dimensions = [width, height];
 			active.params = params;
 			_pub.reposition();
@@ -263,32 +335,50 @@ var iBox = function() {
 
 				_pub.updateObject(els.content.style, {width: '', height: ''});
 
-				var width = parseInt(els.wrapper.style.width);
-				var height = parseInt(els.wrapper.style.height);
+				var width;
+				var height;
+				if(_pub.is_webkit)
+				{
+				    // MP: workaround for WebKit browsers to avoid scrollbars in case of sufficient workspace
+					width = els.wrapper.clientWidth;
+					height = els.wrapper.clientHeight;
+				}
+				else
+				{
+					width = parseInt(els.wrapper.style.width);
+					height = parseInt(els.wrapper.style.height);
+				}
 
 				// if we can resize this, make sure it fits in our page bounds
 				if (active.params.can_resize) {
 					var x = pagesize.width;
 					var y = pagesize.height;
+					var dimensionChanged = false;
 					
 					x -= offset.container[0];
 					y -= offset.container[1];
 					if (width > x) {
 						if (active.params.constrain) height = height * (x/width);
 						width = x;
+						
+						dimensionChanged = true;
 					}
 					if (height > y) {
 						if (active.params.constrain) width = width * (y/height);
 						height = y;
+
+						dimensionChanged = true;
 					}
-					_pub.updateObject(els.wrapper.style, {width: width + 'px', height: height + 'px'});
+					if(dimensionChanged) _pub.updateObject(els.wrapper.style, {width: width + 'px', height: height + 'px'});
 				}
 
-				//els.content.style.width = width - offset.wrapper[0] + 'px';
+                // MP: another resizing mechanism in case of a smaller browser window
+				els.content.style.width = width - offset.wrapper[0] - offset.wrapper[2] + 'px';
 				// TODO: this isn't adjusting to the right height for containers that are smaller than the page height
 				// resize the wrappers height based on the content boxes height
 				// this needs to be height - ibox_content[margin+padding+border]
-				els.content.style.height = height - offset.wrapper[1] + 'px';
+                // MP: another resizing mechanism in case of a smaller browser window
+				els.content.style.height = height - offset.wrapper[1] - offset.wrapper[3] + 'px';
 				if (active.dimensions != ['100%', '100%']) _pub.center(els.wrapper);
 			}
 			
@@ -494,8 +584,8 @@ var iBox = function() {
 			 for (var i=0; i<pairs.length; i++) {
 					var keyval = pairs[i].split('=');
 					if (!keyval || keyval.length != 2) continue;
-					var key = decodeURIComponent(keyval[0]);
-					var val = decodeURIComponent(keyval[1]);
+					var key = unescape(keyval[0]);
+					var val = unescape(keyval[1]);
 					val = val.replace(/\+/g, ' ');
 					if (val[0] == '"') var token = '"';
 					else if (val[0] == "'") var token = "'";
@@ -586,14 +676,18 @@ var iBox = function() {
 		els.overlay.id = 'ibox_overlay';
 		params = {position: 'absolute', top: 0, left: 0, width: '100%'};
 		_pub.updateObject(els.overlay.style, params);
+		// MP: Moved to the showInit function to be able to customize behaviour
 		// MS: Add 'cancel' flag to hide
-		els.overlay.onclick = function() { _pub.hide(true) };
+		// els.overlay.onclick = function() { _pub.hide(true) };
 		els.container.appendChild(els.overlay);
 
 		els.loading = document.createElement('div');
 		els.loading.id = 'ibox_loading';
+		// MP: Moved modification done by AK to the showInit function to be able to add localization support
 		// AK: Use the loading message from _pub
-		els.loading.innerHTML = _pub.loading_message;
+		// els.loading.innerHTML = _pub.loading_message;
+		// MP: Adding dummy text node
+		els.loading.innerHTML = '&nbsp;';
 		els.loading.style.display = 'none';
 		els.loading.onclick = function() {
 			// MS: Add 'cancel' flag to hide
@@ -606,9 +700,16 @@ var iBox = function() {
 		els.wrapper.id = 'ibox_wrapper';
 		_pub.updateObject(els.wrapper.style, {position: 'absolute', top: 0, left: 0, display: 'none'});
 
+        // MP: introduce an additional DIV to replace the old margin definition mechanism
+        //     (see #ibox_spacer CSS rule definition for further details).
+		var contentSpacer = document.createElement('div');
+		contentSpacer.id = 'ibox_spacer';
+		_pub.updateObject(contentSpacer.style, {overflow: 'hidden'});
+		els.wrapper.appendChild(contentSpacer);
+
 		els.content = document.createElement('div');
 		els.content.id = 'ibox_content';
-		_pub.updateObject(els.content.style, {overflow: 'auto'})
+		_pub.updateObject(els.content.style, {overflow: 'auto'});
 		els.wrapper.appendChild(els.content);
 	
 		var child = document.createElement('div');
@@ -680,8 +781,11 @@ var iBox = function() {
 		
 		// MS added params to _pub
 		_pub.params = params;
+
+		// MP: Moved functionality to this place to allow localization of loading message
+		els.loading.innerHTML = (params.loadingMessage? params.loadingMessage : _pub.loading_message);
 		els.loading.style.display = "block";
-		
+
 		_pub.center(els.loading);
 		_pub.reposition();
 
@@ -693,6 +797,10 @@ var iBox = function() {
 		// set title here
 		els.footer.innerHTML = title || "&nbsp;";
 
+		// MP: Moved functionality to this place to support the new 'overlayClose' parameter
+		if(params.overlayClose === undefined) params.overlayClose = true;
+		// MS: Add 'cancel' flag to hide
+		els.overlay.onclick = (params.overlayClose? function() { _pub.hide(true) } : null);
 		// setup background
 		els.overlay.style.display = "block";
 		
@@ -717,7 +825,10 @@ var iBox = function() {
 	
 	var drawCSS = function() {
 		// Core CSS (positioning/etc)
-		var core_styles = "#ibox {z-index:1000;text-align:left;} #ibox_overlay {z-index:1000;} #ibox_loading {position:absolute;z-index:1001;} #ibox_wrapper {margin:30px;position:absolute;top:0;left:0;z-index:1001;} #ibox_content {z-index:1002;margin:27px 5px 5px 5px;padding:2px;} #ibox_content object {display:block;} #ibox_content .ibox_image {width:100%;height:100%;margin:0;padding:0;border:0;display:block;} #ibox_footer_wrapper a {float:right;display:block;outline:0;margin:0;padding:0;} #ibox_footer_wrapper {text-align:left;position:absolute;top:5px;right:5px;left:5px;white-space:nowrap;overflow:hidden;}";
+        // MP: replace the old margin definition mechanism by a new one
+		//     (please adapt the 'top' and 'left' property of the '#ibox_content'
+		//     rule if you modify one of the 'ibox_spacer' padding values)
+		var core_styles = "#ibox {z-index:1000000;text-align:left;} #ibox_overlay {z-index:1000000;} #ibox_loading {position:absolute;z-index:1000001;} #ibox_wrapper {margin:30px;position:absolute;top:0;left:0;z-index:1000001;} #ibox_spacer {padding:27px 5px 5px 5px;width:0px;height:0px;visibility:hidden} #ibox_content {z-index:1000002;position:absolute;top:27px;left:5px;padding:2px;} #ibox_content object {display:block;} #ibox_content .ibox_image {width:100%;height:100%;margin:0;padding:0;border:0;display:block;} #ibox_footer_wrapper a {float:right;display:block;outline:0;margin:0;padding:0;} #ibox_footer_wrapper {text-align:left;position:absolute;top:5px;right:5px;left:5px;white-space:nowrap;overflow:hidden;}";
 		
 		// Default style/theme/skin/whatever
 		var default_skin = "#ibox_footer_wrapper {font-weight:bold;height:20px;line-height:20px;} #ibox_footer_wrapper a {text-decoration:none;background:#888;border:1px solid #666;line-height:16px;padding:0 5px;color:#333;font-weight:bold;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;} #ibox_footer_wrapper a:hover {background-color:#bbb;color:#111;} #ibox_footer_wrapper {font-size:12px;font-family:Verdana, Arial, Helvetica, sans-serif;color:#111;} #ibox_wrapper {border:1px solid #ccc;} #ibox_wrapper {background-color:#999;}#ibox_content {background-color:#eee;border:1px solid #666;} #ibox_loading {padding:50px; background:#000;color:#fff;font-size:16px;font-weight:bold;}";
@@ -820,7 +931,8 @@ var iBox = function() {
 				if (!elemSrc) {
 					was_error = true;
 					// AK: Changed to _pub.error_message_loading
-					_pub.html(document.createTextNode(_pub.error_message_loading), params);
+					// MP: Modification to allow localization of loading error message  
+					_pub.html(document.createTextNode((params.loadingErrorMessage? params.loadingErrorMessage : _pub.error_message_loading)), params);
 				}
 				else {
 					original_wrapper = elemSrc.parentNode;
@@ -855,7 +967,8 @@ var iBox = function() {
 				}
 				img.onerror = function() {
 					// AK: Changed to _pub.error_message_loading
-					_pub.html(document.createTextNode(_pub.error_message_loading), params);
+					// MP: Modification to allow localization of loading error message  
+					_pub.html(document.createTextNode((params.loadingErrorMessage? params.loadingErrorMessage : _pub.error_message_loading)), params);
 				}
 				img.src = url;
 			}
@@ -902,8 +1015,7 @@ var iBox = function() {
 			}
 		}
 	}();
-	// RB schould be placed at the end of the plugin queue.  Otherwise it brakes the YouTube plugin.
-	_pub.plugins.register(iBoxPlugin_External, true);
+	_pub.plugins.register(iBoxPlugin_External);
 
 	var iBoxPlugin_Document = function() {
 		return {
@@ -922,7 +1034,8 @@ var iBox = function() {
 						}
 						else {
 							// AK: Changed to _pub.error_message_loading
-							_pub.html(document.createTextNode(_pub.error_message_loading), params);
+							// MP: Modification to allow localization of loading error message  
+							_pub.html(document.createTextNode((params.loadingErrorMessage? params.loadingErrorMessage : _pub.error_message_loading)), params);
 						}
 					}
 				}
@@ -933,7 +1046,8 @@ var iBox = function() {
 					_pub.http.send(null);
 				}
 				catch (ex) {
-					_pub.html(document.createTextNode('There was an error loading the document.'), params);
+					// MP: Modification to allow localization of loading error message  
+					_pub.html(document.createTextNode((params.loadingErrorMessage? params.loadingErrorMessage : _pub.error_message_loading)), params);
 				}
 			}
 		};
