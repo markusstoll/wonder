@@ -19,8 +19,9 @@ import com.webobjects.appserver._private.WOURLValuedElementData;
 import com.webobjects.foundation.NSArray;
 import com.webobjects.foundation.NSBundle;
 import com.webobjects.foundation.NSDictionary;
-import com.webobjects.foundation.NSMutableDictionary;
 import com.webobjects.foundation.NSForwardException;
+import com.webobjects.foundation.NSLog;
+import com.webobjects.foundation.NSMutableDictionary;
 import com.webobjects.foundation.NSPathUtilities;
 import com.webobjects.foundation._NSStringUtilities;
 import com.webobjects.foundation._NSThreadsafeMutableDictionary;
@@ -45,12 +46,12 @@ public class ERXResourceManager extends WOResourceManager {
 	private WODeployedBundle TheAppProjectBundle;
 	private _NSThreadsafeMutableDictionary<String, WOURLValuedElementData> _urlValuedElementsData;
 	private IVersionManager _versionManager;
-    private final _NSThreadsafeMutableDictionary _myFrameworkProjectBundles = new _NSThreadsafeMutableDictionary(new NSMutableDictionary(128));
+	private final _NSThreadsafeMutableDictionary _myFrameworkProjectBundles = new _NSThreadsafeMutableDictionary(new NSMutableDictionary(128));
 	private static final NSDictionary<String, String> _mimeTypes = _additionalMimeTypes();
 
 	protected ERXResourceManager() {
 		TheAppProjectBundle = _initAppBundle();
-        _initFrameworkProjectBundles();
+		_initFrameworkProjectBundles();
 		try {
 			Field field = WOResourceManager.class.getDeclaredField("_urlValuedElementsData");
 			field.setAccessible(true);
