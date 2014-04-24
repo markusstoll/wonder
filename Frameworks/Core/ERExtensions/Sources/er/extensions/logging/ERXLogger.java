@@ -14,6 +14,7 @@ import com.webobjects.foundation.NSLog;
 import com.webobjects.foundation.NSNotificationCenter;
 
 import er.extensions.foundation.ERXConfigurationManager;
+import er.extensions.foundation.ERXProperties;
 import er.extensions.foundation.ERXSystem;
 
 /**
@@ -29,6 +30,8 @@ public class ERXLogger extends org.apache.log4j.Logger {
 	/** logging supprt */
 	public static Logger log;
 	public static Factory factory = null;
+	private static boolean cvResetLoggerConfiguration = true;
+
 	static {
 		String factoryClassName = System.getProperty("log4j.loggerFactory");
 		if (factoryClassName == null) {
@@ -48,6 +51,8 @@ public class ERXLogger extends org.apache.log4j.Logger {
 		} else {
 			ERXLogger.factory = new Factory();
 		}
+		
+		cvResetLoggerConfiguration = ERXProperties.booleanForKeyWithDefault(ERXLogger.class.getName() + ".resetLoggerConfiguration", true);
 	}
 
 	/**
@@ -173,7 +178,7 @@ public class ERXLogger extends org.apache.log4j.Logger {
 	 *            with the logging configuration
 	 */
 	public static synchronized void configureLogging(Properties properties) {
-		LogManager.resetConfiguration();
+		if(cvResetLoggerConfiguration) LogManager.resetConfiguration();
 		BasicConfigurator.configure();
 		// AK: we re-configure the logging a few lines later from the
 		// properties, but in case
