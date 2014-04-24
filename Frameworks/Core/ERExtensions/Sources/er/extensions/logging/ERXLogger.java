@@ -178,14 +178,18 @@ public class ERXLogger extends org.apache.log4j.Logger {
 	 *            with the logging configuration
 	 */
 	public static synchronized void configureLogging(Properties properties) {
-		if(cvResetLoggerConfiguration) LogManager.resetConfiguration();
-		BasicConfigurator.configure();
-		// AK: we re-configure the logging a few lines later from the
-		// properties, but in case
-		// no config is set, we set the root level to info, install the brigde
-		// which sets it's own logging level to DEBUG
-		// and the output should be pretty much the same as with plain WO
-		Logger.getRootLogger().setLevel(Level.INFO);
+	    // mpaulus: check is necessary to preserve an existing logger configuration.
+		if(cvResetLoggerConfiguration)
+		{
+			LogManager.resetConfiguration();
+			BasicConfigurator.configure();
+			// AK: we re-configure the logging a few lines later from the
+			// properties, but in case
+			// no config is set, we set the root level to info, install the brigde
+			// which sets it's own logging level to DEBUG
+			// and the output should be pretty much the same as with plain WO
+			Logger.getRootLogger().setLevel(Level.INFO);
+		}
 		int allowedLevel = NSLog.debug.allowedDebugLevel();
 		if (!(NSLog.debug instanceof ERXNSLogLog4jBridge)) {
 			NSLog.setOut(new ERXNSLogLog4jBridge(ERXNSLogLog4jBridge.OUT));
