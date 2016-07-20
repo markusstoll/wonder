@@ -923,25 +923,7 @@ public class ERXExtensions extends ERXFrameworkPrincipal {
      */
     public static void initApp(Class applicationSubclass, String[] args) {
 		try {
-	    	File woaFolder = new File(".").getCanonicalFile();
-	    	if (!woaFolder.getName().endsWith(".woa")) {
-	    		if (new File(woaFolder, ".project").exists()) {
-	    			File buildFolder = new File(new File(woaFolder, "build"), woaFolder.getName() + ".woa");
-	    			if (buildFolder.exists()) {
-	    				woaFolder = buildFolder;
-	    			}
-	    			else {
-		    			File distFolder = new File(new File(woaFolder, "dist"), woaFolder.getName() + ".woa");
-	    				if (distFolder.exists()) {
-	    					woaFolder = distFolder;
-	    				}
-	    				else {
-	    					//Bundle-less builds. Yay!
-	    		    		//throw new IllegalArgumentException("You must run your application from a .woa folder to call this method.");
-	    				}
-	    			}
-	    		}
-	    	}
+			File woaFolder = mainBundleFolder();
 	    	ERXExtensions.initApp(null, woaFolder.toURI().toURL(), applicationSubclass, args);
 		}
 		catch (IOException e) {
@@ -1156,4 +1138,28 @@ public class ERXExtensions extends ERXFrameworkPrincipal {
     		_eofInitializeLock.unlock();
     	}
     }
+
+	public static File mainBundleFolder() throws IOException {
+    	File woaFolder = new File(".").getCanonicalFile();
+    	if (!woaFolder.getName().endsWith(".woa")) {
+    		if (new File(woaFolder, ".project").exists()) {
+    			File buildFolder = new File(new File(woaFolder, "build"), woaFolder.getName() + ".woa");
+    			if (buildFolder.exists()) {
+    				woaFolder = buildFolder;
+    			}
+    			else {
+	    			File distFolder = new File(new File(woaFolder, "dist"), woaFolder.getName() + ".woa");
+    				if (distFolder.exists()) {
+    					woaFolder = distFolder;
+    				}
+    				else {
+    					//Bundle-less builds. Yay!
+    		    		//throw new IllegalArgumentException("You must run your application from a .woa folder to call this method.");
+    				}
+    			}
+    		}
+    	}
+		
+		return woaFolder;
+	}
 }

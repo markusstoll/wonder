@@ -1,0 +1,26 @@
+{
+    attributes = (
+        {
+            columnName = COUNT; 
+            externalType = INTEGER; 
+            name = count; 
+            valueClassName = NSNumber; 
+            valueType = i; 
+        }, 
+        {
+            allowsNull = N; 
+            columnName = id; 
+            externalType = INTEGER; 
+            name = id; 
+            valueClassName = NSNumber; 
+            valueType = i; 
+        }
+    ); 
+    attributesUsedForLocking = (count, id); 
+    className = "er.test.eof.concurrency.data.TestEntity"; 
+    classProperties = (count); 
+    externalName = "TEST_ENTITY"; 
+    fetchSpecificationDictionary = {}; 
+    name = TestEntity; 
+    primaryKeyAttributes = (id); 
+}
