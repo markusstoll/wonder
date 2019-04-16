@@ -89,6 +89,7 @@ Autocompleter.Base = Class.create({
 
     Event.observe(this.element, 'blur', this.onBlur.bindAsEventListener(this));
     Event.observe(this.element, 'keydown', this.onKeyPress.bindAsEventListener(this));
+    Event.observe(this.element, 'input', this.onInput.bindAsEventListener(this));
     // AK new option: activateOnFocus
     if(this.options.activateOnFocus) {
       Event.observe(this.element, 'focus', this.onActivate.bindAsEventListener(this));
@@ -135,6 +136,16 @@ Autocompleter.Base = Class.create({
     if(this.options.indicator) Element.hide(this.options.indicator);
   },
 
+  onInput: function(event) {
+	  this.changed = true;
+	  this.hasFocus = true;
+
+	  if(this.observer) clearTimeout(this.observer);
+	  this.observer =
+		  setTimeout(this.onObserverEvent.bind(this), this.options.frequency*1000);
+  },
+
+
   onKeyPress: function(event) {
     if(this.active)
       switch(event.keyCode) {
@@ -162,15 +173,7 @@ Autocompleter.Base = Class.create({
          return;
       }
      else
-       if(event.keyCode==Event.KEY_TAB || event.keyCode==Event.KEY_RETURN ||
-         (Prototype.Browser.WebKit > 0 && event.keyCode == 0)) return;
-
-    this.changed = true;
-    this.hasFocus = true;
-
-    if(this.observer) clearTimeout(this.observer);
-      this.observer =
-        setTimeout(this.onObserverEvent.bind(this), this.options.frequency*1000);
+       if(event.keyCode==Event.KEY_TAB || event.keyCode==Event.KEY_RETURN) return;
   },
 
   activate: function() {
