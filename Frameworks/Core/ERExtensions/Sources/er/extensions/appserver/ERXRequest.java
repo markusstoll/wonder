@@ -446,37 +446,40 @@ public  class ERXRequest extends WORequest {
         	NSMutableDictionary<String, NSArray<String>> cookieDictionary = new NSMutableDictionary<String, NSArray<String>>();
         	//
         	// from WORequest._cookieDescription()
-        	String cookie = headerForKey("cookie");
-        	if (cookie == null || cookie.length() == 0)
+        	NSArray<String> cookieHeaders = headersForKey("cookie");
+        	if (cookieHeaders.isEmpty())
         		// IIS cookies use a different header
-        		cookie = headerForKey("http_cookie");
+        		cookieHeaders = headersForKey("http_cookie");
         	
-        	if (cookie != null && cookie.length() > 0) {
-        		String[] cookies = cookie.split(";");
-        		for (int i = 0; i < cookies.length; i++) {
-        			try {
-        				//
-        				// only parse one cookie at a time => get(0)
-        				HttpCookie httpCookie = HttpCookie.parse(cookies[i]).get(0);
-        				//
-        				// Cookies with longer paths are listed before cookies with shorter paths:
-        				// see https://stackoverflow.com/a/24214538
-        				// Cookies with longer Patch are more specific than cookies with shorter path 
-        				// and should not be replaced by a less specific cookie 
-        				// If a cookie with Therfore we do not override cookies if there are already there!
-        				String cookieName  = httpCookie.getName();
-        				String cookieValue = httpCookie.getValue();
-        				log.debug("Cookie: '"+cookieName+"' = '"+cookieValue+"'");
-        				NSArray<String> cookieValueArray = cookieDictionary.get(cookieName);
-        				if ( cookieValueArray == null ){
-        					cookieValueArray = new NSArray<>();
-        				}
-        				cookieValueArray = cookieValueArray.arrayByAddingObject(cookieValue);
-        				cookieDictionary.put( cookieName, cookieValueArray );
-        			} catch (Throwable t) {
-        				log.warn("Unable to parse cookie '"+cookies[i]+"' : "+t.getMessage());
-        			}
-        		}
+        	for(String cookieHeader : cookieHeaders)
+        	{
+            	if (cookieHeader != null && cookieHeader.length() > 0) {
+            		String[] cookies = cookieHeader.split(";");
+            		for (int i = 0; i < cookies.length; i++) {
+            			try {
+            				//
+            				// only parse one cookie at a time => get(0)
+            				HttpCookie httpCookie = HttpCookie.parse(cookies[i]).get(0);
+            				//
+            				// Cookies with longer paths are listed before cookies with shorter paths:
+            				// see https://stackoverflow.com/a/24214538
+            				// Cookies with longer Patch are more specific than cookies with shorter path 
+            				// and should not be replaced by a less specific cookie 
+            				// If a cookie with Therfore we do not override cookies if there are already there!
+            				String cookieName  = httpCookie.getName();
+            				String cookieValue = httpCookie.getValue();
+            				log.debug("Cookie: '"+cookieName+"' = '"+cookieValue+"'");
+            				NSArray<String> cookieValueArray = cookieDictionary.get(cookieName);
+            				if ( cookieValueArray == null ){
+            					cookieValueArray = new NSArray<>();
+            				}
+            				cookieValueArray = cookieValueArray.arrayByAddingObject(cookieValue);
+            				cookieDictionary.put( cookieName, cookieValueArray );
+            			} catch (Throwable t) {
+            				log.warn("Unable to parse cookie '"+cookies[i]+"' : "+t.getMessage());
+            			}
+            		}
+            	}
         	}
         	_cookieDictionary = cookieDictionary.immutableClone();
         }
