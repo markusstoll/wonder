@@ -1,6 +1,6 @@
 package er.examples.erjaxws.ws;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 @WebService
 

@@ -4,7 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
+import jakarta.xml.ws.BindingProvider;
 
 import com.webobjects.appserver.WOActionResults;
 import com.webobjects.appserver.WOApplication;
@@ -36,7 +36,7 @@ public class Main extends BaseComponent {
 		/* setting this property is essential for enabling stateful mode in our client proxy
 		 * after setting this, session cookies will be passed to the server on subsequent
 		 * requests */
-		((BindingProvider) sAction).getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+		((BindingProvider) sAction).getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, Boolean.TRUE);
 
 		sAction.authenticate("name", "password");
 		serverOutput = sAction.testAction("test");

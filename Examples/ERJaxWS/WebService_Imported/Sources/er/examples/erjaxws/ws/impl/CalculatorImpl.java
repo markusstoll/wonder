@@ -1,6 +1,6 @@
 package er.examples.erjaxws.ws.impl;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import er.examples.erjaxws.ws.Calculator;
 

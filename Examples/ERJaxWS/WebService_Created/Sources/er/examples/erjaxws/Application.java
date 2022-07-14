@@ -1,6 +1,6 @@
 package er.examples.erjaxws;
 
-import javax.xml.ws.Endpoint;
+import jakarta.xml.ws.Endpoint;
 
 import er.examples.erjaxws.ws.Calculator;
 import er.extensions.appserver.ERXApplication;

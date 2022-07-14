@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is JAX-WS RI 2.1.10-hudson-jaxws-ri-2.1.x-release-5-. --><xs:schema xmlns:tns="http://ws.erjaxws.examples.er/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://ws.erjaxws.examples.er/">
+
+<xs:element name="StatefulActionException" type="tns:statefulActionFaultInfo" />
+
+<xs:element name="authenticate" type="tns:authenticate" />
+
+<xs:element name="authenticateResponse" type="tns:authenticateResponse" />
+
+<xs:element name="testAction" type="tns:testAction" />
+
+<xs:element name="testActionResponse" type="tns:testActionResponse" />
+
+<xs:complexType name="testAction">
+<xs:sequence>
+<xs:element name="arg0" type="xs:string" minOccurs="0" />
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="authenticate">
+<xs:sequence>
+<xs:element name="arg0" type="xs:string" minOccurs="0" />
+<xs:element name="arg1" type="xs:string" minOccurs="0" />
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="testActionResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0" />
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="statefulActionFaultInfo">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0" />
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="authenticateResponse">
+<xs:sequence />
+</xs:complexType>
+</xs:schema>
