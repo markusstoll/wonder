@@ -4,14 +4,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
+import com.oracle.webservices.api.message.BasePropertySet;
 import com.sun.istack.NotNull;
-import com.sun.xml.ws.api.PropertySet;
 import com.sun.xml.ws.api.server.WebServiceContextDelegate;
 import com.sun.xml.ws.transport.http.WSHTTPConnection;
 import com.webobjects.appserver.WOApplication;
@@ -38,7 +39,6 @@ public class ERWSWOHTTPConnection
 {
     public static final String ERJAXWS_WOCONTEXT = "com.webobjects.appserver.WOContext";
     public static final String ERJAXWS_ERXWOCONTEXT = "er.extensions.appserver.ERXWOContext";
-    private static final Logger log = LoggerFactory.getLogger(ERWSWOHTTPConnection.class);
 	
     /** the current ERXRequest */
     ERXRequest woRequest;
@@ -57,7 +57,7 @@ public class ERWSWOHTTPConnection
     /** the associated session **/
     WOSession session = null;
     
-	private static final PropertySet.PropertyMap model = parse(ERWSWOHTTPConnection.class);
+	private static final BasePropertySet.PropertyMap model = parse(ERWSWOHTTPConnection.class);
 
     /**
      * The constructor 
@@ -135,7 +135,7 @@ public class ERWSWOHTTPConnection
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-	@PropertySet.Property({ "javax.xml.ws.http.request.headers",
+	@BasePropertySet.Property({ "javax.xml.ws.http.request.headers",
 	"com.sun.xml.ws.api.message.packet.inbound.transport.headers" })
     @NotNull
     @Override
@@ -171,7 +171,7 @@ public class ERWSWOHTTPConnection
     /* (non-Javadoc)
      * @see com.sun.xml.ws.transport.http.WSHTTPConnection#getResponseHeaders()
      */
-	@PropertySet.Property({ "javax.xml.ws.http.response.headers",
+	@BasePropertySet.Property({ "javax.xml.ws.http.response.headers",
 	"com.sun.xml.ws.api.message.packet.outbound.transport.headers" })
     @Override
     public Map<String, List<String>> getResponseHeaders()
@@ -258,7 +258,7 @@ public class ERWSWOHTTPConnection
      * @see com.sun.xml.ws.api.PropertySet#getPropertyMap()
      */
     @Override
-	protected PropertySet.PropertyMap getPropertyMap() 
+	protected BasePropertySet.PropertyMap getPropertyMap() 
     {
 		return model;
 	}
@@ -287,7 +287,7 @@ public class ERWSWOHTTPConnection
         }
         catch(IOException e)
         {
-            log.error("Exception on writing response.", e);
+            Logger.getLogger("er.extensions.appserver.ws.ERJaxWebServiceRequestHandler.Logging").error("Exception on writing response", e);
             return null;
         }
         
@@ -296,7 +296,7 @@ public class ERWSWOHTTPConnection
 
 	private WOContext context = null;
 
-	@PropertySet.Property({ "com.webobjects.appserver.WOContext" })
+	@BasePropertySet.Property({ "com.webobjects.appserver.WOContext" })
 	public synchronized WOContext WOContext()
 	{
 		if(context == null)
@@ -317,7 +317,7 @@ public class ERWSWOHTTPConnection
 		return context;
 	}
 
-    @PropertySet.Property({ "er.extensions.appserver.ERXWOContext" })
+    @BasePropertySet.Property({ "er.extensions.appserver.ERXWOContext" })
     public synchronized ERXWOContext ERXWOContext()
     {
         WOContext c = WOContext();
@@ -333,6 +333,41 @@ public class ERWSWOHTTPConnection
 	private String getSessionIDFromCookie()
 	{
 		return woRequest.cookieValueForKey(WOApplication.application().sessionIdKey());
+	}
+
+	@Override
+	public Set<String> getRequestHeaderNames() {
+		return new HashSet<String>(woRequest.headerKeys());
+	}
+
+	@Override
+	public List<String> getRequestHeaderValues(String arg0) {
+		return woRequest.headersForKey(arg0);
+	}
+
+	@Override
+	public String getRequestScheme() {
+		return woRequest.isSecure() ? "https" : "http";
+	}
+
+	@Override
+	public String getRequestURI() {
+		return woRequest.uri();
+	}
+
+	@Override
+	public String getServerName() {
+		return woRequest._serverName();
+	}
+
+	@Override
+	public int getServerPort() {
+		return woRequest._acceptingPort();
+	}
+
+	@Override
+	public void setResponseHeader(String key, List<String> values) {
+        woResponse.setHeaders(values, key);
 	}
 	
 }

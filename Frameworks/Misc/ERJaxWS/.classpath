@@ -9,34 +9,41 @@
 	<classpathentry kind="con" path="WOFramework/JavaXML"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="WOFramework/ERExtensions"/>
-	<classpathentry kind="lib" path="Libraries/activation.jar"/>
-	<classpathentry kind="lib" path="Libraries/FastInfoset.jar"/>
-	<classpathentry kind="lib" path="Libraries/gmbal-api-only.jar"/>
-	<classpathentry kind="lib" path="Libraries/ha-api.jar"/>
-	<classpathentry kind="lib" path="Libraries/http.jar"/>
-	<classpathentry kind="lib" path="Libraries/javax.annotation-api.jar"/>
-	<classpathentry kind="lib" path="Libraries/javax.xml.soap-api.jar"/>
-	<classpathentry kind="lib" path="Libraries/jaxb-api.jar"/>
-	<classpathentry kind="lib" path="Libraries/jaxb-core.jar"/>
-	<classpathentry kind="lib" path="Libraries/jaxb-impl.jar"/>
-	<classpathentry kind="lib" path="Libraries/jaxb-jxc.jar"/>
-	<classpathentry kind="lib" path="Libraries/jaxb-xjc.jar"/>
-	<classpathentry kind="lib" path="Libraries/jaxws-api.jar"/>
-	<classpathentry kind="lib" path="Libraries/jaxws-rt.jar"/>
-	<classpathentry kind="lib" path="Libraries/jaxws-tools.jar"/>
-	<classpathentry kind="lib" path="Libraries/jsr173_api.jar"/>
-	<classpathentry kind="lib" path="Libraries/jsr181-api.jar"/>
-	<classpathentry kind="lib" path="Libraries/jsr250-api.jar"/>
-	<classpathentry kind="lib" path="Libraries/management-api.jar"/>
-	<classpathentry kind="lib" path="Libraries/mimepull.jar"/>
-	<classpathentry kind="lib" path="Libraries/policy.jar"/>
-	<classpathentry kind="lib" path="Libraries/resolver.jar"/>
-	<classpathentry kind="lib" path="Libraries/saaj-api.jar"/>
-	<classpathentry kind="lib" path="Libraries/saaj-impl.jar"/>
-	<classpathentry kind="lib" path="Libraries/stax-ex.jar"/>
-	<classpathentry kind="lib" path="Libraries/stax2-api.jar"/>
-	<classpathentry kind="lib" path="Libraries/streambuffer.jar"/>
-	<classpathentry kind="lib" path="Libraries/woodstox-core-asl.jar"/>
-	<classpathentry kind="lib" path="Libraries/woodstox.jar"/>
+	<classpathentry kind="lib" path="Libraries/commonj.sdo-2.1.1.jar"/>
+	<classpathentry kind="lib" path="Libraries/FastInfoset-2.0.0.jar"/>
+	<classpathentry kind="lib" path="Libraries/gmbal-api-only-4.0.3.jar"/>
+	<classpathentry kind="lib" path="Libraries/ha-api-3.1.13.jar"/>
+	<classpathentry kind="lib" path="Libraries/hamcrest-core-1.3.jar"/>
+	<classpathentry kind="lib" path="Libraries/istack-commons-runtime-4.0.1.jar"/>
+	<classpathentry kind="lib" path="Libraries/jakarta.activation-2.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="Libraries/jakarta.annotation-api-2.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="Libraries/jakarta.jws-api-3.0.0.jar"/>
+	<classpathentry kind="lib" path="Libraries/jakarta.mail-2.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="Libraries/jakarta.xml.bind-api-3.0.1.jar"/>
+	<classpathentry kind="lib" path="Libraries/jakarta.xml.soap-api-2.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="Libraries/jakarta.xml.ws-api-3.0.1.jar"/>
+	<classpathentry kind="lib" path="Libraries/jaxb-core-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/jaxb-impl-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/jaxb-jxc-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/jaxb-runtime-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/jaxb-xjc-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/jaxws-eclipselink-plugin-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/jaxws-rt-3.0.2.jar" sourcepath="/Users/mstoll/.m2/repository/com/sun/xml/ws/jaxws-rt/3.0.2/jaxws-rt-3.0.2-sources.jar"/>
+	<classpathentry kind="lib" path="Libraries/jaxws-tools-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/joda-time-2.9.9.jar"/>
+	<classpathentry kind="lib" path="Libraries/management-api-3.2.3.jar"/>
+	<classpathentry kind="lib" path="Libraries/mimepull-1.9.15.jar"/>
+	<classpathentry kind="lib" path="Libraries/org.eclipse.persistence.asm-9.1.0.jar"/>
+	<classpathentry kind="lib" path="Libraries/org.eclipse.persistence.core-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/org.eclipse.persistence.moxy-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/org.eclipse.persistence.sdo-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/saaj-impl-2.0.1.jar"/>
+	<classpathentry kind="lib" path="Libraries/sdo-eclipselink-plugin-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/slf4j-api-1.7.32.jar"/>
+	<classpathentry kind="lib" path="Libraries/stax2-api-4.2.1.jar"/>
+	<classpathentry kind="lib" path="Libraries/stax-ex-2.0.1.jar"/>
+	<classpathentry kind="lib" path="Libraries/streambuffer-2.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/txw2-3.0.2.jar"/>
+	<classpathentry kind="lib" path="Libraries/woodstox-core-6.2.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
